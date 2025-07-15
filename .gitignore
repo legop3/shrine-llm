@@ -1,0 +1,14 @@
+./realdata
+/realdata
+discord_training_data.json
+/fine_tuned_model
+./fine_tuned_model
+/results
+./results
+./node_modules
+/node_modules
+node_modules
+/discord_model
+./discord_model
+discord_model
+.env

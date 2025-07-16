@@ -12,3 +12,6 @@ node_modules
 ./discord_model
 discord_model
 .env
+/discord_finetuned_model
+./discord_finetuned_model
+discord_finetuned_model

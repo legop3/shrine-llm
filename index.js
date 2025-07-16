@@ -44,6 +44,15 @@ class Generator extends EventEmitter {
             this.emit('token', data.toString())
         })
 
+        this.bridge.stderr.on('data', (err) => {
+            console.error(err.toString())
+        })
+
+        this.bridge.on('close', () => {
+            console.log('bridge closed')
+            this.emit('close')
+        })
+
     }
 
 
@@ -60,29 +69,52 @@ client.on('messageCreate', async message => {
     // console.log(message.content)
     const prefix = message.content.toLowerCase().split(' ')[0]
     const content = message.content.split(' ').slice(1).join(' ')
-    console.log(content)
+    // console.log(content)
     switch (prefix) {
         case 'shrine':
+            // console.log(message.author)
             // message.reply(`shrine speak ${content}`)
-            streaming = ''
-            shrinegen = new Generator(content, 500, 0.7, './discord_model')
-            toEdit = await message.reply('Awaiting response..')
-            console.log(toEdit)
+            let streaming = ''
+            let input = `${message.author.globalName}: ${content}`
+            let shrinegen = new Generator(input, 1000, 1, './discord_finetuned_model')
+            let toEdit = await message.reply('Processing Information')
+            // console.log(toEdit)
             
             let lastEdit = 0
-            const editCooldown = 4000
-            
+            const editCooldown = 2500
+            let pendingEdit = false
+
+            const flushEdit = () => {
+            if (streaming && !pendingEdit) {
+                pendingEdit = true
+
+                // if(streaming) {
+                toEdit.edit(`- ${streaming}`)
+                // }
+
+                lastEdit = Date.now()
+                pendingEdit = false
+            }
+            }
+
             shrinegen.on('token', token => {
-                console.log(token)
-                streaming += token
-                console.log(streaming)
-                
-                const now = Date.now()
-                if (now - lastEdit > editCooldown) {
-                    toEdit.edit(`Response: ${streaming}`)
-                    lastEdit = now
-                }
+            console.log(token)
+            streaming += token
+            console.log(streaming)
+            
+            const now = Date.now()
+            if (now - lastEdit > editCooldown) {
+                flushEdit()
+            }
             })
+
+            // Handle stream completion - flush any remaining tokens
+            shrinegen.on('close', () => {
+            // Force final edit regardless of cooldown
+                flushEdit()
+            })
+
+
 
             break;
         case 'ross':

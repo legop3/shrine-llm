@@ -16,9 +16,9 @@ model = GPT2LMHeadModel.from_pretrained(sys.argv[4])
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.pad_token_id = tokenizer.eos_token_id
 
-def generate_response(input_text, max_length=int(sys.argv[2])):
+def generate_response(input_text, maxlength=int(sys.argv[2])):
     # Format like training data
-    prompt = f"{input_text} ->"
+    prompt = f"{input_text}"
     
     # Create streamer that will output to stdout
     streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
@@ -27,17 +27,18 @@ def generate_response(input_text, max_length=int(sys.argv[2])):
     inputs = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True)
     
     # Generate with streaming
+    inputs = tokenizer(prompt, return_tensors="pt")
+    
     with torch.no_grad():
         outputs = model.generate(
-            inputs['input_ids'],
-            attention_mask=inputs['attention_mask'],
-            max_length=max_length,
-            num_return_sequences=1,
+            **inputs,
+            # max_length=inputs['input_ids'].shape[1] + 50,
+            max_length=maxlength,
             temperature=float(sys.argv[3]),
-            pad_token_id=tokenizer.eos_token_id,
             do_sample=True,
-            repetition_penalty=1.5,
-            streamer=streamer  # This enables streaming to stdout
+            pad_token_id=tokenizer.eos_token_id,
+            num_return_sequences=1,
+            streamer=streamer
         )
 
 # Test it

@@ -82,8 +82,8 @@ def find_optimal_batch_size(tokenizer, max_memory_gb=100):
 def train_model():
     # Load tokenizer and model
     print("Loading model and tokenizer...")
-    tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-    model = GPT2LMHeadModel.from_pretrained('gpt2', torch_dtype=torch.float32)
+    tokenizer = GPT2Tokenizer.from_pretrained('gpt2-medium')
+    model = GPT2LMHeadModel.from_pretrained('gpt2-medium', torch_dtype=torch.float32)
     
     # Add padding token (GPT-2 doesn't have one by default)
     tokenizer.pad_token = tokenizer.eos_token

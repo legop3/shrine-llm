@@ -104,7 +104,7 @@ def train_model():
     dataset = DiscordDataset('discord_training_data.json', tokenizer, max_length=256)
     
     # Calculate training steps
-    num_epochs = 1
+    num_epochs = 2
     total_steps = (len(dataset) // optimal_batch_size) * num_epochs
     warmup_steps = min(500, total_steps // 10)  # 10% of total steps or 500, whichever is smaller
     
@@ -117,7 +117,7 @@ def train_model():
     
     # Training arguments optimized for CPU
     training_args = TrainingArguments(
-        output_dir='./discord_model',
+        output_dir='./ross_model',
         num_train_epochs=num_epochs,
         per_device_train_batch_size=optimal_batch_size,
         gradient_accumulation_steps=gradient_accumulation,
@@ -156,8 +156,8 @@ def train_model():
     
     # Save the model
     print("Saving model...")
-    trainer.save_model('./discord_finetuned_model')
-    tokenizer.save_pretrained('./discord_finetuned_model')
+    trainer.save_model('./ross_finetuned_model')
+    tokenizer.save_pretrained('./ross_finetuned_model')
     
     print("Training complete!")
     

@@ -74,23 +74,23 @@ client.on('messageCreate', async message => {
         case 'shrine':
             // console.log(message.author)
             // message.reply(`shrine speak ${content}`)
-            let streaming = ''
-            let input = `${message.author.globalName}: ${content}`
+            streaming = ''
+            input = `${message.author.globalName}: ${content}\n`
             let shrinegen = new Generator(input, 1000, 1, './discord_finetuned_model')
-            let toEdit = await message.reply('Processing Information')
+            toEdit = await message.reply('Processing Information')
             // console.log(toEdit)
             
-            let lastEdit = 0
-            const editCooldown = 2500
-            let pendingEdit = false
+            lastEdit = 0
+            editCooldown = 2500
+            pendingEdit = false
 
-            const flushEdit = () => {
+            flushEdit = () => {
             if (streaming && !pendingEdit) {
                 pendingEdit = true
 
-                // if(streaming) {
-                toEdit.edit(`- ${streaming}`)
-                // }
+                if(streaming) {
+                    toEdit.edit(`${streaming}`)
+                }
 
                 lastEdit = Date.now()
                 pendingEdit = false
@@ -98,14 +98,14 @@ client.on('messageCreate', async message => {
             }
 
             shrinegen.on('token', token => {
-            console.log(token)
-            streaming += token
-            console.log(streaming)
-            
-            const now = Date.now()
-            if (now - lastEdit > editCooldown) {
-                flushEdit()
-            }
+                console.log(token)
+                streaming += token
+                console.log(streaming)
+                
+                const now = Date.now()
+                if (now - lastEdit > editCooldown) {
+                    flushEdit()
+                }
             })
 
             // Handle stream completion - flush any remaining tokens
@@ -118,12 +118,62 @@ client.on('messageCreate', async message => {
 
             break;
         case 'ross':
-            message.reply('Ross is not yet implemented')
+            // message.reply('Ross is not yet implemented')
+
+            // message.reply(`shrine speak ${content}`)
+            streaming = ''
+            input = `${message.author.globalName}: ${content}\n`
+            let rossgen = new Generator(input, 1000, 1, './ross_model')
+            toEdit = await message.reply('Processing Information')
+            // console.log(toEdit)
+            
+            lastEdit = 0
+            editCooldown = 2500
+            pendingEdit = false
+
+            flushEdit = () => {
+            if (streaming && !pendingEdit) {
+                pendingEdit = true
+
+                if(streaming) {
+                    toEdit.edit(`${streaming}`)
+                }
+
+                lastEdit = Date.now()
+                pendingEdit = false
+            }
+            }
+
+            rossgen.on('token', token => {
+                console.log(token)
+                streaming += token
+                console.log(streaming)
+                
+                const now = Date.now()
+                if (now - lastEdit > editCooldown) {
+                    flushEdit()
+                }
+            })
+
+            // Handle stream completion - flush any remaining tokens
+            rossgen.on('close', () => {
+            // Force final edit regardless of cooldown
+                flushEdit()
+            })
+            
+
+
+
+
             break;
     
         default:
             break;
     }
 })
+
+
+
+
 
 client.login(process.env.DISCORD_BOT_TOKEN)

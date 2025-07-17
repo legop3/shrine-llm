@@ -76,7 +76,7 @@ client.on('messageCreate', async message => {
             // message.reply(`shrine speak ${content}`)
             streaming = ''
             input = `${message.author.globalName}: ${content}\n`
-            let shrinegen = new Generator(input, 1000, 1, './discord_finetuned_model')
+            let shrinegen = new Generator(input, 1000, 0.7, './discord_finetuned_model')
             toEdit = await message.reply('Processing Information')
             // console.log(toEdit)
             
